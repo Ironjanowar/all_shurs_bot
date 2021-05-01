@@ -34,14 +34,14 @@ defmodule AllShursBot.Bot do
            data: "register",
            from: %{id: user_id} = user,
            message: %{chat: %{id: chat_id}}
-         }},
+         }} = message,
         context
       ) do
     case user
          |> Map.merge(%{chat_id: chat_id, user_id: user_id})
          |> AllShursBot.register_user() do
       {:already_registered, _} ->
-        nil
+        answer_callback(context, message, text: "You are already registered", show_alert: true)
 
       {formatted_message, opts} ->
         opts = Keyword.merge([parse_mode: "Markdown"], opts)
