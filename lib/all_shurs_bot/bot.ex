@@ -22,13 +22,10 @@ defmodule AllShursBot.Bot do
   end
 
   def handle({:command, :register, %{chat: %{id: chat_id} = chat}}, context) do
-    case chat |> Map.put(:chat_id, chat_id) |> AllShursBot.register() do
-      {formatted_message, nil} ->
-        answer(context, formatted_message, parse_mode: "Markdown")
+    {formatted_message, opts} = chat |> Map.put(:chat_id, chat_id) |> AllShursBot.register()
+    opts = Keyword.merge([parse_mode: "Markdown"], opts)
 
-      {formatted_message, reply_markup} ->
-        answer(context, formatted_message, parse_mode: "Markdown", reply_markup: reply_markup)
-    end
+    answer(context, formatted_message, opts)
   end
 
   def handle(
@@ -46,14 +43,9 @@ defmodule AllShursBot.Bot do
       {:already_registered, _} ->
         nil
 
-      {formatted_message, nil} ->
-        edit(context, :inline, formatted_message, parse_mode: "Markdown")
-
-      {formatted_message, reply_markup} ->
-        edit(context, :inline, formatted_message,
-          parse_mode: "Markdown",
-          reply_markup: reply_markup
-        )
+      {formatted_message, opts} ->
+        opts = Keyword.merge([parse_mode: "Markdown"], opts)
+        edit(context, :inline, formatted_message, opts)
     end
   end
 end

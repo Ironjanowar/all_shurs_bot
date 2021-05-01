@@ -3,7 +3,7 @@ defmodule AllShursBot.MessageFormatter do
 
   def format_register_message([]) do
     reply_markup = generate_register_keyboard()
-    {"There are no users registered yet!", reply_markup}
+    {"There are no users registered yet!", reply_markup: reply_markup}
   end
 
   def format_register_message([%User{} | _] = users) do
@@ -14,7 +14,7 @@ defmodule AllShursBot.MessageFormatter do
 
     reply_markup = generate_register_keyboard()
 
-    {formatted_message, reply_markup}
+    {formatted_message, reply_markup: reply_markup}
   end
 
   def format_register_message(_) do
