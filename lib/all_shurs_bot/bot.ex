@@ -28,6 +28,23 @@ defmodule AllShursBot.Bot do
     answer(context, formatted_message, opts)
   end
 
+  def handle({:inline_query, %{query: ""}}, _context) do
+    :ignore
+  end
+
+  def handle(
+        {:inline_query,
+         %{
+           query: text,
+           from: %{id: user_id},
+           message: %{chat: %{id: chat_id}}
+         }},
+        context
+      ) do
+    articles = AllShursBot.generate_mention_articles(text, chat_id, user_id)
+    answer_inline_query(context, articles)
+  end
+
   def handle(
         {:callback_query,
          %{
@@ -37,13 +54,18 @@ defmodule AllShursBot.Bot do
          }} = message,
         context
       ) do
-    case user
-         |> Map.merge(%{chat_id: chat_id, user_id: user_id})
-         |> AllShursBot.register_user() do
+    require Logger
+
+    user
+    |> Map.merge(%{chat_id: chat_id, user_id: user_id})
+    |> AllShursBot.register_user()
+    |> case do
       {:already_registered, _} ->
+        Logger.warn("ALREADY REGISTERED")
         answer_callback(context, message, text: "You are already registered", show_alert: true)
 
       {formatted_message, opts} ->
+        Logger.warn("NOT REGISTERED")
         opts = Keyword.merge([parse_mode: "Markdown"], opts)
         edit(context, :inline, formatted_message, opts)
     end

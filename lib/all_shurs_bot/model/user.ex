@@ -47,4 +47,14 @@ defmodule AllShursBot.Model.User do
   def get_users_from_chat(_) do
     {:error, "can not get users from chat"}
   end
+
+  def get_all_users_in_chat(chat_id, opts \\ []) do
+    from(user in User, where: ^chat_id == user.chat_id)
+    |> add_exception(opts[:except])
+    |> Repo.all()
+  end
+
+  # Private
+  defp add_exception(query, nil), do: query
+  defp add_exception(query, user_id), do: where(query, [user], user.user_id != ^user_id)
 end

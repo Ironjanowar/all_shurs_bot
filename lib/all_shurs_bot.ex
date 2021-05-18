@@ -46,4 +46,11 @@ defmodule AllShursBot do
   def register_user(_) do
     {"**There was an error:** chat_id not provided", nil}
   end
+
+  def generate_mention_articles(text, chat_id, user_id) do
+    case User.get_all_users_in_chat(chat_id, except: user_id) do
+      [] -> MessageFormatter.generate_register_article()
+      users -> MessageFormatter.generate_mention_article(text, users)
+    end
+  end
 end
