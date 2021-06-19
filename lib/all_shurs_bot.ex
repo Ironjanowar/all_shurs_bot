@@ -58,7 +58,7 @@ defmodule AllShursBot do
     end
   end
 
-  @valid_mention_triggers ["@here ", "@all ", "@shures ", "@todos ", "@putos "]
+  @valid_mention_triggers ["@here", "@all", "@shures", "@todos", "@putos"]
   def is_mention(text) when is_binary(text) do
     String.starts_with?(text, @valid_mention_triggers)
   end
