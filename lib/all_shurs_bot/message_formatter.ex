@@ -3,6 +3,18 @@ defmodule AllShursBot.MessageFormatter do
   alias ExGram.Model.InlineQueryResultArticle
   alias ExGram.Model.InputTextMessageContent
 
+  def help_text() do
+    """
+    Register everybody in the group by sending /register and clicking in the provided button.
+
+    Mention every registered member by starting a message with:
+      - `@here`
+      - `@all`
+      - `@shures`
+      - `@todos`
+    """
+  end
+
   def format_register_message(), do: format_register_message([])
 
   def format_register_message([]) do

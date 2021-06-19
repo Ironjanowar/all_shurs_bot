@@ -18,7 +18,8 @@ defmodule AllShursBot.Bot do
   end
 
   def handle({:command, :help, _msg}, context) do
-    answer(context, "Here is your help:")
+    message = AllShursBot.MessageFormatter.help_text()
+    answer(context, message, parse_mode: "Markdown")
   end
 
   def handle({:command, :register, %{chat: %{id: chat_id} = chat}}, context) do
