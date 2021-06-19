@@ -25,23 +25,6 @@ defmodule AllShursBot.MessageFormatter do
     {"**There was an error:** can not format the message", nil}
   end
 
-  def generate_mention_article(text, users) do
-    mention_message = format_mention_message(text, users)
-
-    [
-      %InlineQueryResultArticle{
-        type: "article",
-        id: 1,
-        title: "@here #{text}",
-        input_message_content: %InputTextMessageContent{
-          message_text: mention_message,
-          parse_mode: "Markdown"
-        },
-        description: "Mentions all registered members in this chat"
-      }
-    ]
-  end
-
   def generate_register_article() do
     {message_text, reply_markup} = format_register_message()
 
@@ -60,6 +43,15 @@ defmodule AllShursBot.MessageFormatter do
     ]
   end
 
+  def format_answer_message([%User{} | _] = users) do
+    answer_text = users |> Enum.map(&"@#{&1.username || &1.first_name}") |> Enum.join(" ")
+    {:ok, answer_text}
+  end
+
+  def format_answer_message(_) do
+    {:error, "Can not format invalid users"}
+  end
+
   # Utils
   defp format_user_name(%User{username: nil, first_name: first_name}), do: first_name
 
@@ -73,15 +65,5 @@ defmodule AllShursBot.MessageFormatter do
 
   defp generate_register_keyboard() do
     ExGram.Dsl.create_inline([[[text: "Register!", callback_data: "register"]]])
-  end
-
-  defp format_mention_message(text, users) do
-    usernames = Enum.map(users, &"@#{&1.username || &1.first_name}")
-
-    """
-    #{usernames}
-
-    #{text}
-    """
   end
 end

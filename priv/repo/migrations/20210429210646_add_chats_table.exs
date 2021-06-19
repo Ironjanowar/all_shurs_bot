@@ -3,7 +3,7 @@ defmodule AllShursBot.Repo.Migrations.AddChatsTable do
 
   def change do
     create table(:chats) do
-      add(:chat_id, :integer, null: false)
+      add(:chat_id, :string, null: false)
       add(:type, :string)
       add(:username, :string)
       add(:first_name, :string)

@@ -28,21 +28,13 @@ defmodule AllShursBot.Bot do
     answer(context, formatted_message, opts)
   end
 
-  def handle({:inline_query, %{query: ""}}, _context) do
-    :ignore
-  end
-
   def handle(
-        {:inline_query,
-         %{
-           query: text,
-           from: %{id: user_id},
-           message: %{chat: %{id: chat_id}}
-         }},
+        {:text, text, %{message_id: message_id, from: %{id: user_id}, chat: %{id: chat_id}}},
         context
       ) do
-    articles = AllShursBot.generate_mention_articles(text, chat_id, user_id)
-    answer_inline_query(context, articles)
+    with {:ok, answer_text} <- AllShursBot.mention_all(text, chat_id, user_id) do
+      answer(context, answer_text, reply_to_message_id: message_id)
+    end
   end
 
   def handle(

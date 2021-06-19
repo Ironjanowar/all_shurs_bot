@@ -14,11 +14,12 @@ defmodule AllShursBot do
       MessageFormatter.format_register_message(users)
     else
       {:error, error} ->
-        {"**There was an error:** #{error}", nil}
+        Logger.error(inspect(error))
+        {"**There was an error**", []}
 
       error ->
         Logger.error("Unexpected error: #{inspect(error)}")
-        {"**There was an error**", nil}
+        {"**There was an error**", []}
     end
   end
 
@@ -34,7 +35,8 @@ defmodule AllShursBot do
       {:error, error} when is_binary(error) ->
         {"**There was an error:** #{error}", nil}
 
-      {:error, %Ecto.Changeset{}} ->
+      {:error, %Ecto.Changeset{} = error} ->
+        Logger.error("Changeset error: #{inspect(error)}")
         {:already_registered, nil}
 
       error ->
@@ -47,10 +49,19 @@ defmodule AllShursBot do
     {"**There was an error:** chat_id not provided", nil}
   end
 
-  def generate_mention_articles(text, chat_id, user_id) do
-    case User.get_all_users_in_chat(chat_id, except: user_id) do
-      [] -> MessageFormatter.generate_register_article()
-      users -> MessageFormatter.generate_mention_article(text, users)
+  def mention_all(text, chat_id, user_id) do
+    if is_mention(text) do
+      users = User.get_all_users_in_chat(chat_id, except: user_id)
+      MessageFormatter.format_answer_message(users)
+    else
+      {:error, "No mention detected"}
     end
   end
+
+  @valid_mention_triggers ["@here ", "@all ", "@shures ", "@todos ", "@putos "]
+  def is_mention(text) when is_binary(text) do
+    String.starts_with?(text, @valid_mention_triggers)
+  end
+
+  def is_mention(_), do: false
 end

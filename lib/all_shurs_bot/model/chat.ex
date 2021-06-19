@@ -6,7 +6,7 @@ defmodule AllShursBot.Model.Chat do
   import Ecto.Changeset
 
   schema "chats" do
-    field(:chat_id, :integer, null: false)
+    field(:chat_id, :string, null: false)
     field(:type, :string)
     field(:username, :string)
     field(:first_name, :string)
@@ -32,7 +32,10 @@ defmodule AllShursBot.Model.Chat do
   end
 
   def get_or_insert(chat) do
-    case Repo.get_by(__MODULE__, chat_id: chat[:chat_id]) do
+    chat_id = to_string(chat[:chat_id])
+    chat = %{chat | chat_id: chat_id}
+
+    case Repo.get_by(__MODULE__, chat_id: chat_id) do
       nil -> chat |> changeset() |> Repo.insert()
       chat -> {:ok, chat}
     end
