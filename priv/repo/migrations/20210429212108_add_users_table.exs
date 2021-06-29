@@ -12,6 +12,6 @@ defmodule AllShursBot.Repo.Migrations.AddUsersTable do
       timestamps()
     end
 
-    create index(:users, [:user_id], unique: true)
+    create index(:users, [:user_id, :chat_id], unique: true)
   end
 end

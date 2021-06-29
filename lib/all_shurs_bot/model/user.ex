@@ -31,7 +31,7 @@ defmodule AllShursBot.Model.User do
     %__MODULE__{}
     |> cast(attrs, @user_fields)
     |> validate_required([:user_id])
-    |> unique_constraint(:user_id)
+    |> unique_constraint([:user_id, :chat_id])
   end
 
   def insert(attrs), do: attrs |> ids_to_string() |> changeset() |> Repo.insert()
