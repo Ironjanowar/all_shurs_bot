@@ -34,7 +34,7 @@ defmodule AllShursBot.Bot do
         context
       ) do
     with {:ok, answer_text} <- AllShursBot.mention_all(text, chat_id, user_id) do
-      answer(context, answer_text, reply_to_message_id: message_id)
+      answer(context, answer_text, reply_to_message_id: message_id, parse_mode: "Markdown")
     end
   end
 

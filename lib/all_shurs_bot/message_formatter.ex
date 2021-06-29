@@ -56,7 +56,7 @@ defmodule AllShursBot.MessageFormatter do
   end
 
   def format_answer_message([%User{} | _] = users) do
-    answer_text = users |> Enum.map(&"@#{&1.username || &1.first_name}") |> Enum.join(" ")
+    answer_text = users |> Enum.map(&format_user_name/1) |> Enum.join(" ")
     {:ok, answer_text}
   end
 
@@ -65,13 +65,13 @@ defmodule AllShursBot.MessageFormatter do
   end
 
   # Utils
-  defp format_user_name(%User{username: nil, first_name: first_name}), do: first_name
-
-  defp format_user_name(%User{username: nil, first_name: nil, last_name: last_name}),
-    do: last_name
-
-  defp format_user_name(%User{username: nil, first_name: nil, last_name: nil, user_id: user_id}),
-    do: "A random guy with this user_id #{user_id}"
+  defp format_user_name(%User{
+         username: nil,
+         first_name: first_name,
+         last_name: last_name,
+         user_id: user_id
+       }),
+       do: "[#{first_name || last_name}](tg://user?id=#{user_id})"
 
   defp format_user_name(%User{username: username}), do: "@#{username}"
 
