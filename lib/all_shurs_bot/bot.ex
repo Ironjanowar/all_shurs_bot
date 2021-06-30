@@ -6,8 +6,9 @@ defmodule AllShursBot.Bot do
     setup_commands: true
 
   command("start")
-  command("help", description: "Print the bot's help")
-  command("register", description: "Register users for the current")
+  command("help", description: "Prints the bot's help")
+  command("register", description: "Registers users in this chat")
+  command("remove", description: "Removes an user from the registered users")
 
   middleware(ExGram.Middleware.IgnoreUsername)
 
@@ -29,6 +30,14 @@ defmodule AllShursBot.Bot do
     answer(context, formatted_message, opts)
   end
 
+  def handle({:command, :remove, %{from: %{id: user_id} = user, chat: %{id: chat_id}}}, context) do
+    {formatted_message, opts} =
+      user |> Map.merge(%{chat_id: chat_id, user_id: user_id}) |> AllShursBot.remove_user()
+
+    opts = Keyword.merge([parse_mode: "Markdown"], opts)
+    answer(context, formatted_message, opts)
+  end
+
   def handle(
         {:text, text, %{message_id: message_id, from: %{id: user_id}, chat: %{id: chat_id}}},
         context
@@ -41,25 +50,32 @@ defmodule AllShursBot.Bot do
   def handle(
         {:callback_query,
          %{
+           id: callback_query_id,
            data: "register",
            from: %{id: user_id} = user,
            message: %{chat: %{id: chat_id}}
-         }} = message,
+         } = callback_query},
         context
       ) do
     require Logger
 
-    user
-    |> Map.merge(%{chat_id: chat_id, user_id: user_id})
-    |> AllShursBot.register_user()
-    |> case do
+    register_result =
+      user
+      |> Map.merge(%{chat_id: chat_id, user_id: user_id})
+      |> AllShursBot.register_user()
+
+    case register_result do
       {:already_registered, _} ->
         Logger.warn("ALREADY REGISTERED")
-        answer_callback(context, message, text: "You are already registered", show_alert: true)
+
+        answer_callback(context, callback_query,
+          text: "You are registered. Send /remove if you don't want to be mentioned"
+        )
 
       {formatted_message, opts} ->
         Logger.warn("NOT REGISTERED")
         opts = Keyword.merge([parse_mode: "Markdown"], opts)
+        ExGram.answer_callback_query(callback_query_id, text: "You have been registered!")
         edit(context, :inline, formatted_message, opts)
     end
   end

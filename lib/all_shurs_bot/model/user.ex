@@ -36,6 +36,15 @@ defmodule AllShursBot.Model.User do
 
   def insert(attrs), do: attrs |> ids_to_string() |> changeset() |> Repo.insert()
 
+  def remove(attrs) do
+    attrs = ids_to_string(attrs)
+
+    case get_user_from_chat(attrs) do
+      nil -> {:error, :user_not_found}
+      user -> Repo.delete(user)
+    end
+  end
+
   def get_users_from_chat(%Chat{chat_id: chat_id}) do
     get_users_from_chat(chat_id)
   end
@@ -62,6 +71,14 @@ defmodule AllShursBot.Model.User do
 
   def get_all_users_in_chat(chat_id, opts) do
     chat_id |> to_string() |> get_all_users_in_chat(opts)
+  end
+
+  def get_user_from_chat(%{user_id: user_id, chat_id: chat_id}),
+    do: get_user_from_chat(user_id, chat_id)
+
+  def get_user_from_chat(user_id, chat_id) do
+    from(user in User, where: ^chat_id == user.chat_id and ^user_id == user.user_id)
+    |> Repo.one()
   end
 
   # Private

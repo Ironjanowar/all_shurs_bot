@@ -24,7 +24,7 @@ defmodule AllShursBot do
   end
 
   def register(_) do
-    {"**There was an error:** not enought data to store the chat", nil}
+    {"**There was an error:** not enought data to store the chat", []}
   end
 
   def register_user(%{chat_id: chat_id} = attrs) do
@@ -33,20 +33,41 @@ defmodule AllShursBot do
       MessageFormatter.format_register_message(users)
     else
       {:error, error} when is_binary(error) ->
-        {"**There was an error:** #{error}", nil}
+        {"**There was an error:** #{error}", []}
 
       {:error, %Ecto.Changeset{} = error} ->
         Logger.error("Changeset error: #{inspect(error)}")
-        {:already_registered, nil}
+        {:already_registered, []}
 
       error ->
         Logger.error("Unexpected error: #{inspect(error)}")
-        {"**There was an error**", nil}
+        {"**There was an error**", []}
     end
   end
 
   def register_user(_) do
-    {"**There was an error:** chat_id not provided", nil}
+    {"**There was an error:** chat_id not provided", []}
+  end
+
+  def remove_user(attrs) do
+    case User.remove(attrs) do
+      {:ok, user} ->
+        MessageFormatter.format_remove_message(user)
+
+      {:error, :user_not_found} ->
+        MessageFormatter.format_already_removed_message(attrs)
+
+      {:error, error} when is_binary(error) ->
+        {"**There was an error:** #{error}", []}
+
+      {:error, %Ecto.Changeset{} = error} ->
+        Logger.error("Changeset error: #{inspect(error)}")
+        {:already_registered, []}
+
+      error ->
+        Logger.error("Unexpected error: #{inspect(error)}")
+        {"**There was an error**", []}
+    end
   end
 
   def mention_all(text, chat_id, user_id) do

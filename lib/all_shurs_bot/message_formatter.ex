@@ -1,7 +1,5 @@
 defmodule AllShursBot.MessageFormatter do
   alias AllShursBot.Model.User
-  alias ExGram.Model.InlineQueryResultArticle
-  alias ExGram.Model.InputTextMessageContent
 
   def help_text() do
     """
@@ -12,6 +10,8 @@ defmodule AllShursBot.MessageFormatter do
       - `@all`
       - `@shures`
       - `@todos`
+
+    If you don't want to be mentioned by the bot no more send /remove
     """
   end
 
@@ -37,26 +37,8 @@ defmodule AllShursBot.MessageFormatter do
     {"**There was an error:** can not format the message", nil}
   end
 
-  def generate_register_article() do
-    {message_text, reply_markup} = format_register_message()
-
-    [
-      %InlineQueryResultArticle{
-        type: "article",
-        id: 1,
-        title: "Click here to register",
-        input_message_content: %InputTextMessageContent{
-          message_text: message_text,
-          parse_mode: "Markdown"
-        },
-        reply_markup: reply_markup,
-        description: "No registered members in this chat"
-      }
-    ]
-  end
-
   def format_answer_message([%User{} | _] = users) do
-    answer_text = users |> Enum.map(&format_user_name/1) |> Enum.join(" ")
+    answer_text = users |> Enum.map(&format_user_mention/1) |> Enum.join(" ")
     {:ok, answer_text}
   end
 
@@ -64,8 +46,22 @@ defmodule AllShursBot.MessageFormatter do
     {:error, "Can not format invalid users"}
   end
 
+  def format_remove_message(%User{} = user) do
+    formatted_user = format_user_name(user)
+    formatted_message = "#{formatted_user} is not going to be mentioned anymore"
+
+    {formatted_message, []}
+  end
+
+  def format_already_removed_message(attrs) do
+    formatted_user = format_user_name(attrs)
+    formatted_message = "#{formatted_user} is not registered"
+
+    {formatted_message, []}
+  end
+
   # Utils
-  defp format_user_name(%User{
+  defp format_user_mention(%{
          username: nil,
          first_name: first_name,
          last_name: last_name,
@@ -73,7 +69,16 @@ defmodule AllShursBot.MessageFormatter do
        }),
        do: "[#{first_name || last_name}](tg://user?id=#{user_id})"
 
-  defp format_user_name(%User{username: username}), do: "@#{username}"
+  defp format_user_mention(%{username: username}), do: "@#{username}"
+
+  defp format_user_name(%{
+         username: nil,
+         first_name: first_name,
+         last_name: last_name
+       }),
+       do: "`#{first_name || last_name}`"
+
+  defp format_user_name(%{username: username}), do: "`@#{username}`"
 
   defp generate_register_keyboard() do
     ExGram.Dsl.create_inline([[[text: "Register!", callback_data: "register"]]])
