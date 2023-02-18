@@ -1,21 +1,29 @@
 # AllShursBot
 
-**TODO: Add description**
+[@all_shurs_bot](https://t.me/all_shurs_bot)
 
-## Installation
+# Setup in a chat
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `all_shurs_bot` to your list of dependencies in `mix.exs`:
+Add the bot to any chat and give him access to messages
 
-```elixir
-def deps do
-  [
-    {:all_shurs_bot, "~> 0.1.0"}
-  ]
-end
-```
+![access](./images/access.jpg)
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/all_shurs_bot](https://hexdocs.pm/all_shurs_bot).
+Send `/register` in the group and click the `Register!` button
 
+![register](./images/register.jpg)
+
+# Usage
+
+Mention every registered member by starting a message with:
+  - `@here`
+  - `@all`
+  - `@shures`
+  - `@todos`
+
+![usage](./images/usage.jpg)
+
+# Stop beeing mentioned
+
+If you don't want to be mentioned by the bot no more send `/remove`
+
+![remove](./images/remove.jpg)
