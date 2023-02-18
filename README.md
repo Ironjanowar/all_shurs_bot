@@ -24,6 +24,6 @@ Mention every registered member by starting a message with:
 
 # Stop beeing mentioned
 
-If you don't want to be mentioned by the bot no more send `/remove`
+If you don't want to be mentioned by the bot no more, send `/remove`
 
 ![remove](./images/remove.jpg)
